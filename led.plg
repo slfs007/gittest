@@ -1,0 +1,12 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+C:\Users\MKB\Desktop\EEPROM\LEDµ„’Û\led.uvproj
+Project File Date:  10/07/2014
+
+<h2>Output:</h2>
+compiling main.c...
+source\24C512.h(20): warning C323: newline expected, extra characters found
+source\main.c - 0 Error(s), 1 Warning(s).

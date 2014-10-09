@@ -1,0 +1,5 @@
+"STARTUP.obj",
+"main.obj",
+"24C512.obj",
+"uart.obj" 
+TO "led" 

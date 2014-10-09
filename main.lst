@@ -1,0 +1,92 @@
+C51 COMPILER V9.52.0.0   MAIN                                                              10/09/2014 10:09:43 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN main.obj
+COMPILER INVOKED BY: C:\Dev Program\Keil\C51\BIN\C51.EXE source\main.c BROWSE DEBUG OBJECTEXTEND PRINT(.\main.lst) OBJEC
+                    -T(main.obj)
+
+line level    source
+
+   1          #include "include.h"
+*** WARNING C323 IN LINE 20 OF source\24C512.h: newline expected, extra characters found
+   2          
+   3          unsigned char led_buf[32];
+   4          unsigned char chinese[2];
+   5          void led_display( unsigned char buf[32]);
+   6          void get_cc_matrix(unsigned char cc[2],unsigned char matrix[32]);//cc:chinese characters
+   7          void main()
+   8          { 
+   9   1              unsigned char i;
+  10   1              uart1_init();
+  11   1              P0=0;P1=0;P2=0;
+  12   1      
+  13   1              while(1)
+  14   1              { 
+  15   2                      if( uart1_getchar(& (chinese[0]) ))
+  16   2                      {
+  17   3                              uart1_getchar(& (chinese[1]));
+  18   3                              get_cc_matrix(chinese,led_buf);
+  19   3                              for( i = 0;i < 64; i++)
+  20   3                              {
+  21   4                                      led_display(led_buf);
+  22   4                              }
+  23   3                      }
+  24   2                      led_display(led_buf);
+  25   2              }
+  26   1      }
+  27          void get_cc_matrix(unsigned char cc[2],unsigned char matrix[32])//cc:chinese characters
+  28          {
+  29   1              unsigned long offset;
+  30   1              unsigned char q,w,ch,i,j;
+  31   1              q = cc[0] - 0xa1;
+  32   1              w = cc[1] - 0xa1;
+  33   1      //      uart1_putchar(q);
+  34   1      //      uart1_putchar(w);
+  35   1              offset = (q * 94 + w);
+  36   1              offset <<= 5;
+  37   1              
+  38   1      //      uart1_putchar( (offset >>16) & 0xff);
+  39   1      //      uart1_putchar( (offset >> 8) & 0xff);
+  40   1      //      uart1_putchar( (offset) & 0xff);
+  41   1              for(i = 0;i < 32;i++)
+  42   1              {
+  43   2                      ch= read_random( offset >> 16, (offset & 0xffff) + i);
+  44   2                      matrix[i] = 0;
+  45   2                      for( j = 0; j < 8; j ++)
+  46   2                      {
+  47   3                              matrix[i] |= ( ((ch >> (7-j)) &0x01)<< (j)) ;
+  48   3                      }
+  49   2              }
+  50   1      }
+  51          void led_display(unsigned char buf[32])
+  52          {
+  53   1              unsigned char scan=0,i,j;
+C51 COMPILER V9.52.0.0   MAIN                                                              10/09/2014 10:09:43 PAGE 2   
+
+  54   1              
+  55   1              for(i=0;i<16;i++)
+  56   1              { 
+  57   2                      P1=scan;
+  58   2                      for(j=0;j<20;j++) 
+  59   2                      {                       
+  60   3                              P2=buf[i * 2 ] ;
+  61   3                              P0=buf[i * 2 + 1] ;
+  62   3                      }
+  63   2                      scan++;
+  64   2              }
+  65   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    314    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     34      15
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)

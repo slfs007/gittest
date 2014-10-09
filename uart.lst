@@ -1,0 +1,99 @@
+C51 COMPILER V9.52.0.0   UART                                                              10/07/2014 16:37:43 PAGE 1   
+
+
+C51 COMPILER V9.52.0.0, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN uart.obj
+COMPILER INVOKED BY: C:\Dev Program\Keil\C51\BIN\C51.EXE source\uart.c BROWSE DEBUG OBJECTEXTEND PRINT(.\uart.lst) OBJEC
+                    -T(uart.obj)
+
+line level    source
+
+   1          #include"uart.h"
+   2          
+   3          bit busy1;
+   4          
+   5          struct uart1queue u1buf;
+   6          
+   7          void uart1_init( void)
+   8          {
+   9   1      
+  10   1              uart1_clr();
+  11   1      
+  12   1              SCON = 0X50;
+  13   1              TMOD = 0X20;
+  14   1              TH1 = TL1 = -(FOSC/12/32/BAUD);
+  15   1              TR1 = 1;
+  16   1              ES = 1;
+  17   1              EA = 1;
+  18   1      }
+  19          void uart1_clr( void)
+  20          {
+  21   1              u1buf.head = 0; 
+  22   1              u1buf.end = 0;
+  23   1              u1buf.length = 0;
+  24   1      }
+  25          void uart1_putchar(char ch)
+  26          {
+  27   1              while(busy1);
+  28   1              ACC = ch;
+  29   1              busy1 = 1;
+  30   1              SBUF = ACC;
+  31   1      }
+  32          void uart1_puts(char *s)
+  33          {
+  34   1              while(*s)
+  35   1              {
+  36   2                      uart1_putchar(*s++);
+  37   2              }
+  38   1      }
+  39          char uart1_getchar( unsigned char *ch)
+  40          {
+  41   1              char flag;
+  42   1              if(u1buf.length == 0)
+  43   1              {
+  44   2                      flag = 0;
+  45   2                      *ch = 0;
+  46   2              }else
+  47   1              {       
+  48   2                      flag = 1;
+  49   2                      *ch = u1buf.buf[u1buf.head++];
+  50   2                      u1buf.length--;
+  51   2                      if(u1buf.head == Q_MAX)
+  52   2                              u1buf.head = 0;
+  53   2              }
+  54   1              return flag;
+C51 COMPILER V9.52.0.0   UART                                                              10/07/2014 16:37:43 PAGE 2   
+
+  55   1      }
+  56          void uart1_isr() interrupt 4
+  57          {
+  58   1              if(RI)
+  59   1              {
+  60   2                      RI = 0;
+  61   2                      u1buf.buf[u1buf.end++] = SBUF;
+  62   2                      u1buf.length++;
+  63   2                      if(u1buf.end == (Q_MAX))
+  64   2                      {
+  65   3                              u1buf.end = 0;
+  66   3                      }
+  67   2              }
+  68   1              if(TI)
+  69   1              {
+  70   2                      TI = 0;
+  71   2                      busy1 = 0;
+  72   2              }
+  73   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    195    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     38       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      1    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
